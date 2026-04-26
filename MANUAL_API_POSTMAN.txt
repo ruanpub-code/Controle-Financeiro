@@ -1,0 +1,606 @@
+MANUAL DA API - USO COM POSTMAN
+Projeto: ControleFinanceiro-React
+Data de referencia: 2026-04-24
+
+==================================================
+1) VISAO GERAL
+==================================================
+A API fica centralizada em:
+- backend/public/index.php
+
+Padrao de resposta:
+- sucesso em leitura:
+  {
+    "success": true,
+    "data": [...]
+  }
+
+- sucesso em operacao:
+  {
+    "success": true,
+    "message": "..."
+  }
+
+- erro:
+  {
+    "success": false,
+    "error": "..."
+  }
+
+A autenticacao e baseada em sessao PHP.
+Depois do login, o cliente deve manter o cookie de sessao para acessar endpoints autenticados.
+
+==================================================
+2) COMO CONFIGURAR NO POSTMAN
+==================================================
+Base URL sugerida:
+- desenvolvimento local: http://localhost:8010
+- producao Apache: http://localhost/api ou URL equivalente do servidor
+
+Headers padrao para requests com body JSON:
+- Content-Type: application/json
+
+Configuracao importante no Postman:
+- usar o mesmo host/base URL em todas as requests
+- deixar o Postman armazenar cookies automaticamente
+- apos chamar /api/auth/login, conferir em Cookies se o PHPSESSID foi salvo
+
+Sugestao de variaveis de ambiente no Postman:
+- base_url = http://localhost:8010
+- pessoa_id = 1
+- categoria_id = 1
+- conta_id = 1
+- financeiro_id = 1
+- cofrinho_id = 1
+- aporte_id = 1
+- usuario_id = 1
+- entidade_id = 1
+
+==================================================
+3) AUTENTICACAO
+==================================================
+
+3.1) Healthcheck
+GET {{base_url}}/api/health
+
+Resposta exemplo:
+{
+  "success": true,
+  "project": "ControleFinanceiro",
+  "architecture": "SPA/API",
+  "backend": "PHP",
+  "needsReverseProxyInProduction": true
+}
+
+3.2) Login
+POST {{base_url}}/api/auth/login
+Body JSON:
+{
+  "nome": "admin",
+  "senha": "123456"
+}
+
+Resposta exemplo:
+{
+  "success": true,
+  "user": {
+    "id": 1,
+    "nome": "admin",
+    "perfil": "root",
+    "id_entidade": 1,
+    "entidade_nome": "Empresa X"
+  }
+}
+
+Erros comuns:
+- 422: Informe usuário e senha.
+- 401: Credenciais inválidas.
+- 403: Usuário ou entidade com acesso expirado.
+
+3.3) Sessao atual
+GET {{base_url}}/api/auth/me
+
+Retorna o usuario da sessao atual.
+Sem cookie valido retorna 401.
+
+3.4) Logout
+POST {{base_url}}/api/auth/logout
+Body JSON:
+{}
+
+3.5) Alterar senha
+POST {{base_url}}/api/auth/change-password
+Body JSON:
+{
+  "current_password": "123456",
+  "new_password": "novaSenha123",
+  "confirm_password": "novaSenha123"
+}
+
+==================================================
+4) FILTROS VIA QUERY STRING
+==================================================
+Endpoints GET de listagem aceitam o parametro query:
+- filters
+
+Formato:
+- filters deve ser um JSON serializado em string
+
+Exemplo de URL:
+GET {{base_url}}/api/financeiro?filters=[{"field":"status","op":"like","value1":"pendente"}]
+
+Campos de filtro suportam os tipos:
+- text: like, nlike, eq implicito
+- number: eq, gt, lt, between
+- date: eq, gt, lt, between
+
+Estrutura de uma condicao:
+{
+  "field": "status",
+  "op": "like",
+  "value1": "pendente",
+  "value2": ""
+}
+
+Observacao:
+- no Postman, prefira preencher em Params
+- chave: filters
+- valor: JSON completo em uma unica linha
+
+==================================================
+5) DASHBOARD
+==================================================
+
+5.1) Resumo financeiro
+GET {{base_url}}/api/dashboard/summary
+
+Resposta exemplo:
+{
+  "success": true,
+  "data": {
+    "totalPagar": 350.50,
+    "totalReceber": 1200,
+    "saldoTotal": 8200,
+    "projecaoFinal": 9049.5
+  }
+}
+
+Regra:
+- saldoTotal soma saldo das contas ativas em contas_caixa
+
+5.2) Ultimos lancamentos
+GET {{base_url}}/api/dashboard/recent
+
+Campos de retorno:
+- id
+- tipo
+- status
+- valor
+- data_vencimento
+- pessoa_nome
+- categoria_nome
+
+==================================================
+6) PESSOAS
+==================================================
+
+6.1) Listar
+GET {{base_url}}/api/pessoas
+
+Campos retornados:
+- id
+- tipo
+- nome
+- documento
+- email
+- telefone
+
+6.2) Criar
+POST {{base_url}}/api/pessoas
+Body JSON:
+{
+  "tipo": "Física",
+  "nome": "Maria Silva",
+  "documento": "12345678900",
+  "email": "maria@email.com",
+  "telefone": "11999999999"
+}
+
+Resposta exemplo:
+{
+  "success": true,
+  "message": "Pessoa cadastrada com sucesso.",
+  "id": 10
+}
+
+6.3) Atualizar
+PUT {{base_url}}/api/pessoas/{{pessoa_id}}
+Mesmo body do POST.
+
+6.4) Excluir
+DELETE {{base_url}}/api/pessoas/{{pessoa_id}}
+
+Restricao:
+- nao exclui se houver vinculo no financeiro
+
+==================================================
+7) CATEGORIAS
+==================================================
+
+7.1) Listar
+GET {{base_url}}/api/categorias
+
+Campos retornados:
+- id
+- nome
+- tipo
+- cor
+- ativo
+
+7.2) Criar
+POST {{base_url}}/api/categorias
+Body JSON:
+{
+  "nome": "Salario",
+  "tipo": "receita",
+  "cor": "#22c55e"
+}
+
+Tipos aceitos:
+- receita
+- despesa
+
+Resposta exemplo:
+{
+  "success": true,
+  "message": "Categoria cadastrada com sucesso.",
+  "id": 20
+}
+
+7.3) Atualizar
+PUT {{base_url}}/api/categorias/{{categoria_id}}
+Mesmo body do POST.
+
+7.4) Excluir
+DELETE {{base_url}}/api/categorias/{{categoria_id}}
+
+Restricao:
+- nao exclui se houver vinculo no financeiro
+
+==================================================
+8) CONTAS CAIXA
+==================================================
+
+8.1) Listar
+GET {{base_url}}/api/contas-caixa
+
+Campos retornados:
+- id
+- nome
+- banco
+- agencia
+- conta
+- saldo
+- ativo
+
+8.2) Criar
+POST {{base_url}}/api/contas-caixa
+Body JSON:
+{
+  "nome": "Conta Principal",
+  "banco": "Banco do Brasil",
+  "agencia": "1234",
+  "conta": "98765-0",
+  "saldo": 1000.00
+}
+
+Resposta exemplo:
+{
+  "success": true,
+  "message": "Conta cadastrada com sucesso.",
+  "id": 30
+}
+
+8.3) Atualizar
+PUT {{base_url}}/api/contas-caixa/{{conta_id}}
+Mesmo body do POST.
+
+8.4) Excluir
+DELETE {{base_url}}/api/contas-caixa/{{conta_id}}
+
+Restricao:
+- nao exclui se houver vinculo no financeiro
+
+==================================================
+9) FINANCEIRO
+==================================================
+
+9.1) Listar
+GET {{base_url}}/api/financeiro
+
+Campos retornados:
+- id
+- tipo
+- status
+- valor
+- data_vencimento
+- pessoa_id
+- categoria_id
+- conta_caixa_id
+- pessoa_nome
+- categoria_nome
+- conta_nome
+
+9.2) Criar lancamento
+POST {{base_url}}/api/financeiro
+Body JSON:
+{
+  "pessoa_id": 10,
+  "categoria_id": 20,
+  "conta_caixa_id": 30,
+  "valor": 150.75,
+  "data_vencimento": "2026-04-24"
+}
+
+Regras:
+- pessoa, categoria, conta e valor sao obrigatorios
+- categoria receita gera tipo = receber
+- categoria despesa gera tipo = pagar
+- status inicial = pendente
+
+9.3) Atualizar lancamento
+PUT {{base_url}}/api/financeiro/{{financeiro_id}}
+Mesmo body do POST.
+
+9.4) Excluir lancamento
+DELETE {{base_url}}/api/financeiro/{{financeiro_id}}
+
+Restricao:
+- lancamentos pagos/recebidos nao podem ser excluidos
+
+9.5) Baixar lancamento
+POST {{base_url}}/api/financeiro/{{financeiro_id}}/baixar
+Body JSON:
+{
+  "data_transacao": "2026-04-24"
+}
+
+Regra de saldo da conta caixa:
+- se tipo = pagar, subtrai valor da conta vinculada
+- se tipo = receber, soma valor na conta vinculada
+
+9.6) Estornar lancamento
+POST {{base_url}}/api/financeiro/{{financeiro_id}}/estornar
+Body JSON:
+{}
+
+Regra de saldo da conta caixa:
+- desfaz o ajuste feito na baixa
+- pagar: soma valor de volta
+- receber: subtrai valor
+
+==================================================
+10) COFRINHOS
+==================================================
+
+10.1) Listar cofrinhos
+GET {{base_url}}/api/cofrinhos
+
+Campos retornados:
+- id
+- nome
+- saldo_atual
+- valor_objetivo
+- meses_meta
+- valor_mensal_necessario
+- ativo
+
+10.2) Criar cofrinho
+POST {{base_url}}/api/cofrinhos
+Body JSON:
+{
+  "nome": "Reserva",
+  "saldo_atual": 500,
+  "valor_objetivo": 5000,
+  "meses_meta": 10
+}
+
+10.3) Atualizar cofrinho
+PUT {{base_url}}/api/cofrinhos/{{cofrinho_id}}
+Mesmo body do POST.
+
+10.4) Arquivar cofrinho
+DELETE {{base_url}}/api/cofrinhos/{{cofrinho_id}}
+
+Observacao:
+- o delete arquiva (ativo = 0), nao apaga fisicamente
+
+==================================================
+11) APORTES DE COFRINHO
+==================================================
+
+11.1) Listar aportes
+GET {{base_url}}/api/cofrinhos/aportes
+
+Campos retornados:
+- id
+- id_cofrinho
+- valor
+- data_aporte
+- observacao
+- cofrinho_nome
+
+11.2) Criar aporte
+POST {{base_url}}/api/cofrinhos/aportes
+Body JSON:
+{
+  "id_cofrinho": 40,
+  "valor": 100,
+  "data_aporte": "2026-04-24",
+  "observacao": "Aporte mensal"
+}
+
+Regra:
+- ao criar aporte, saldo_atual do cofrinho e recalculado
+
+11.3) Atualizar aporte
+PUT {{base_url}}/api/cofrinhos/aportes/{{aporte_id}}
+Mesmo body do POST.
+
+Regra:
+- ao editar aporte, o saldo do cofrinho e recalculado
+- se mudar o cofrinho de destino, ajusta origem e destino
+
+11.4) Excluir aporte
+DELETE {{base_url}}/api/cofrinhos/aportes/{{aporte_id}}
+
+Regra:
+- ao excluir, valor e removido do saldo_atual do cofrinho
+
+==================================================
+12) ADMINISTRACAO - USUARIOS
+==================================================
+Requer perfil:
+- admin ou root
+
+12.1) Listar usuarios
+GET {{base_url}}/api/admin/usuarios
+
+12.2) Criar usuario
+POST {{base_url}}/api/admin/usuarios
+Body JSON:
+{
+  "nome": "novo_usuario",
+  "senha": "123456",
+  "perfil": "user",
+  "id_entidade": 1,
+  "datalimite": "2026-12-31"
+}
+
+Observacoes:
+- admin comum nao cria root
+- admin comum usa sempre a propria entidade
+- root pode definir id_entidade livremente
+
+12.3) Atualizar usuario
+PUT {{base_url}}/api/admin/usuarios/{{usuario_id}}
+Body JSON exemplo:
+{
+  "nome": "novo_usuario",
+  "senha": "",
+  "perfil": "admin",
+  "id_entidade": 1,
+  "datalimite": "2026-12-31"
+}
+
+Observacao:
+- se senha vier vazia, senha atual nao e alterada
+
+12.4) Excluir usuario
+DELETE {{base_url}}/api/admin/usuarios/{{usuario_id}}
+
+Restricoes:
+- nao pode excluir o proprio usuario logado
+- admin nao pode excluir usuario root de outra entidade via regra restritiva atual
+
+==================================================
+13) ROOT - ENTIDADES E AUDITORIA
+==================================================
+Requer perfil:
+- root
+
+13.1) Listar entidades
+GET {{base_url}}/api/root/entidades
+
+13.2) Criar entidade
+POST {{base_url}}/api/root/entidades
+Body JSON:
+{
+  "nome": "Nova Empresa",
+  "datalimite": "2026-12-31"
+}
+
+13.3) Atualizar entidade
+PUT {{base_url}}/api/root/entidades/{{entidade_id}}
+Mesmo body do POST.
+
+13.4) Excluir entidade
+DELETE {{base_url}}/api/root/entidades/{{entidade_id}}
+
+Restricao:
+- nao pode excluir a propria entidade em uso
+
+13.5) Auditoria
+GET {{base_url}}/api/root/auditoria
+
+Campos retornados:
+- id
+- usuario_nome
+- usuario_perfil
+- acao
+- recurso_tipo
+- rota
+- created_at
+
+Observacao:
+- se a tabela audit_log nao existir, a API retorna success=true com data=[]
+
+==================================================
+14) EXEMPLO DE FLUXO COMPLETO NO POSTMAN
+==================================================
+1. GET /api/health
+2. POST /api/auth/login
+3. GET /api/auth/me
+4. POST /api/pessoas
+5. POST /api/categorias
+6. POST /api/contas-caixa
+7. POST /api/financeiro
+8. POST /api/financeiro/{id}/baixar
+9. GET /api/dashboard/summary
+10. POST /api/financeiro/{id}/estornar
+
+==================================================
+15) DICAS DE TESTE NO POSTMAN
+==================================================
+- criar uma Collection separada por grupos: Auth, Dashboard, Cadastros, Financeiro, Cofrinhos, Admin, Root
+- usar Environment para ids dinamicos
+- apos criar pessoa/categoria/conta, salvar o id retornado manualmente nas variaveis
+- se quiser automatizar, usar Tests no Postman para capturar IDs
+
+Exemplo de Test script para salvar id retornado:
+if (pm.response.code === 200) {
+  const json = pm.response.json();
+  if (json.id) {
+    pm.environment.set('ultimo_id', json.id);
+  }
+}
+
+==================================================
+16) ERROS COMUNS
+==================================================
+401 Unauthorized
+- login nao feito
+- cookie de sessao nao foi mantido pelo Postman
+
+403 Forbidden
+- perfil sem permissao
+- usuario ou entidade expirados
+
+422 Unprocessable Entity
+- payload invalido
+- data em formato incorreto
+- relacao inexistente entre entidade e registro informado
+
+404 Not Found
+- id inexistente
+- registro nao localizado na entidade atual
+
+==================================================
+17) OBSERVACOES IMPORTANTES
+==================================================
+- A API trabalha com isolamento por entidade usando id_entidade da sessao.
+- Mesmo informando IDs validos, o backend rejeita registros que nao pertencem a entidade atual.
+- Os endpoints de admin/root dependem diretamente do perfil salvo em sessao.
+- Em operacoes financeiras e de aporte existem efeitos colaterais em saldos; testar sempre leitura antes e depois.
+
+FIM

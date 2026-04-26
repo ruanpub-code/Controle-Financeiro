@@ -1,0 +1,782 @@
+{
+  "info": {
+    "_postman_id": "5c4b90fd-4f85-4f7d-9d2b-f5f3d32f4d41",
+    "name": "ControleFinanceiro API",
+    "description": "Collection da API ControleFinanceiro para uso no Postman. Usa autenticacao por sessao PHP e cookies automaticos do Postman.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8010" },
+    { "key": "pessoa_id", "value": "1" },
+    { "key": "categoria_id", "value": "1" },
+    { "key": "conta_id", "value": "1" },
+    { "key": "financeiro_id", "value": "1" },
+    { "key": "cofrinho_id", "value": "1" },
+    { "key": "aporte_id", "value": "1" },
+    { "key": "usuario_id", "value": "1" },
+    { "key": "entidade_id", "value": "1" },
+    { "key": "login_nome", "value": "admin" },
+    { "key": "login_senha", "value": "123456" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Healthcheck",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"{{login_nome}}\",\n  \"senha\": \"{{login_senha}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Sessao Atual",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Alterar Senha",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_password\": \"123456\",\n  \"new_password\": \"novaSenha123\",\n  \"confirm_password\": \"novaSenha123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/change-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "change-password"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Resumo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/summary",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "summary"]
+            }
+          }
+        },
+        {
+          "name": "Ultimos Lancamentos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard/recent",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dashboard", "recent"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pessoas",
+      "item": [
+        {
+          "name": "Listar Pessoas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/pessoas",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pessoas"]
+            }
+          }
+        },
+        {
+          "name": "Criar Pessoa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.id) {",
+                  "  pm.collectionVariables.set('pessoa_id', String(json.id));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"Física\",\n  \"nome\": \"Maria Silva\",\n  \"documento\": \"12345678900\",\n  \"email\": \"maria@email.com\",\n  \"telefone\": \"11999999999\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pessoas",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pessoas"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Pessoa",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"Física\",\n  \"nome\": \"Maria Silva Atualizada\",\n  \"documento\": \"12345678900\",\n  \"email\": \"maria.atualizada@email.com\",\n  \"telefone\": \"11999999998\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pessoas/{{pessoa_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pessoas", "{{pessoa_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Excluir Pessoa",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/pessoas/{{pessoa_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pessoas", "{{pessoa_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categorias",
+      "item": [
+        {
+          "name": "Listar Categorias",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/categorias",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categorias"]
+            }
+          }
+        },
+        {
+          "name": "Criar Categoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.id) {",
+                  "  pm.collectionVariables.set('categoria_id', String(json.id));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Salario\",\n  \"tipo\": \"receita\",\n  \"cor\": \"#22c55e\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/categorias",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categorias"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Categoria",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Salario Atualizado\",\n  \"tipo\": \"receita\",\n  \"cor\": \"#16a34a\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/categorias/{{categoria_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categorias", "{{categoria_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Excluir Categoria",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/categorias/{{categoria_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "categorias", "{{categoria_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Contas Caixa",
+      "item": [
+        {
+          "name": "Listar Contas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/contas-caixa",
+              "host": ["{{base_url}}"],
+              "path": ["api", "contas-caixa"]
+            }
+          }
+        },
+        {
+          "name": "Criar Conta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.id) {",
+                  "  pm.collectionVariables.set('conta_id', String(json.id));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Conta Principal\",\n  \"banco\": \"Banco do Brasil\",\n  \"agencia\": \"1234\",\n  \"conta\": \"98765-0\",\n  \"saldo\": 1000.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/contas-caixa",
+              "host": ["{{base_url}}"],
+              "path": ["api", "contas-caixa"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Conta",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Conta Principal Atualizada\",\n  \"banco\": \"Banco do Brasil\",\n  \"agencia\": \"1234\",\n  \"conta\": \"98765-0\",\n  \"saldo\": 1250.50\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/contas-caixa/{{conta_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "contas-caixa", "{{conta_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Excluir Conta",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/contas-caixa/{{conta_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "contas-caixa", "{{conta_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Financeiro",
+      "item": [
+        {
+          "name": "Listar Lancamentos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/financeiro",
+              "host": ["{{base_url}}"],
+              "path": ["api", "financeiro"]
+            }
+          }
+        },
+        {
+          "name": "Listar Lancamentos Pendentes (com filtro)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/financeiro?filters=%5B%7B%22field%22%3A%22status%22%2C%22op%22%3A%22like%22%2C%22value1%22%3A%22pendente%22%7D%5D",
+              "host": ["{{base_url}}"],
+              "path": ["api", "financeiro"],
+              "query": [
+                {
+                  "key": "filters",
+                  "value": "[{\"field\":\"status\",\"op\":\"like\",\"value1\":\"pendente\"}]"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Criar Lancamento",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pessoa_id\": {{pessoa_id}},\n  \"categoria_id\": {{categoria_id}},\n  \"conta_caixa_id\": {{conta_id}},\n  \"valor\": 150.75,\n  \"data_vencimento\": \"2026-04-24\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/financeiro",
+              "host": ["{{base_url}}"],
+              "path": ["api", "financeiro"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.success) {",
+                  "  console.log('Lancamento criado com sucesso. Atualize financeiro_id manualmente se necessario.');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Atualizar Lancamento",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pessoa_id\": {{pessoa_id}},\n  \"categoria_id\": {{categoria_id}},\n  \"conta_caixa_id\": {{conta_id}},\n  \"valor\": 220.00,\n  \"data_vencimento\": \"2026-04-30\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/financeiro/{{financeiro_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "financeiro", "{{financeiro_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Baixar Lancamento",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data_transacao\": \"2026-04-24\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/financeiro/{{financeiro_id}}/baixar",
+              "host": ["{{base_url}}"],
+              "path": ["api", "financeiro", "{{financeiro_id}}", "baixar"]
+            }
+          }
+        },
+        {
+          "name": "Estornar Lancamento",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/financeiro/{{financeiro_id}}/estornar",
+              "host": ["{{base_url}}"],
+              "path": ["api", "financeiro", "{{financeiro_id}}", "estornar"]
+            }
+          }
+        },
+        {
+          "name": "Excluir Lancamento",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/financeiro/{{financeiro_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "financeiro", "{{financeiro_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cofrinhos",
+      "item": [
+        {
+          "name": "Listar Cofrinhos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/cofrinhos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cofrinhos"]
+            }
+          }
+        },
+        {
+          "name": "Criar Cofrinho",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Reserva\",\n  \"saldo_atual\": 500,\n  \"valor_objetivo\": 5000,\n  \"meses_meta\": 10\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/cofrinhos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cofrinhos"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Cofrinho",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Reserva Atualizada\",\n  \"saldo_atual\": 800,\n  \"valor_objetivo\": 7000,\n  \"meses_meta\": 14\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/cofrinhos/{{cofrinho_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cofrinhos", "{{cofrinho_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Arquivar Cofrinho",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/cofrinhos/{{cofrinho_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cofrinhos", "{{cofrinho_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Aportes",
+      "item": [
+        {
+          "name": "Listar Aportes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/cofrinhos/aportes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cofrinhos", "aportes"]
+            }
+          }
+        },
+        {
+          "name": "Criar Aporte",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_cofrinho\": {{cofrinho_id}},\n  \"valor\": 100,\n  \"data_aporte\": \"2026-04-24\",\n  \"observacao\": \"Aporte mensal\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/cofrinhos/aportes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cofrinhos", "aportes"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Aporte",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_cofrinho\": {{cofrinho_id}},\n  \"valor\": 120,\n  \"data_aporte\": \"2026-04-25\",\n  \"observacao\": \"Aporte revisado\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/cofrinhos/aportes/{{aporte_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cofrinhos", "aportes", "{{aporte_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Excluir Aporte",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/cofrinhos/aportes/{{aporte_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cofrinhos", "aportes", "{{aporte_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Usuarios",
+      "item": [
+        {
+          "name": "Listar Usuarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/usuarios",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "usuarios"]
+            }
+          }
+        },
+        {
+          "name": "Criar Usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"novo_usuario\",\n  \"senha\": \"123456\",\n  \"perfil\": \"user\",\n  \"id_entidade\": {{entidade_id}},\n  \"datalimite\": \"2026-12-31\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/usuarios",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "usuarios"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Usuario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"novo_usuario_atualizado\",\n  \"senha\": \"\",\n  \"perfil\": \"admin\",\n  \"id_entidade\": {{entidade_id}},\n  \"datalimite\": \"2026-12-31\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/usuarios/{{usuario_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "usuarios", "{{usuario_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Excluir Usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/usuarios/{{usuario_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "usuarios", "{{usuario_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Root - Entidades e Auditoria",
+      "item": [
+        {
+          "name": "Listar Entidades",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/root/entidades",
+              "host": ["{{base_url}}"],
+              "path": ["api", "root", "entidades"]
+            }
+          }
+        },
+        {
+          "name": "Criar Entidade",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Nova Empresa\",\n  \"datalimite\": \"2026-12-31\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/root/entidades",
+              "host": ["{{base_url}}"],
+              "path": ["api", "root", "entidades"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Entidade",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Empresa Atualizada\",\n  \"datalimite\": \"2026-12-31\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/root/entidades/{{entidade_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "root", "entidades", "{{entidade_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Excluir Entidade",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/root/entidades/{{entidade_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "root", "entidades", "{{entidade_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Auditoria",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/root/auditoria",
+              "host": ["{{base_url}}"],
+              "path": ["api", "root", "auditoria"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+# ========================
+# Deploy (arquivos sensíveis e temporários)
+# ========================
+Deploy/*.sql
+Deploy/config.php
+Deploy/*.sh
+Deploy/*.log
+
+# ========================
+# Frontend (React)
+# ========================
+# Dependências
+frontend/node_modules/
+frontend/.pnp
+frontend/.pnp.js
+
+# Build de produção
+frontend/dist/
+frontend/build/
+
+# Arquivos de log
+frontend/*.log
+frontend/build_log.txt
+frontend/build_output.log
+frontend/build_success.log
+frontend/final_build.log
+
+# Arquivos de ambiente
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Cache
+frontend/.cache/
+frontend/.parcel-cache/
+
+# IDE e editor
+frontend/.vscode/
+frontend/.idea/
+frontend/*.swp
+frontend/*.swo
+*~
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# ========================
+# Backend (PHP)
+# ========================
+# Logs
+*.log
+error_log
+
+# Cache
+.cache/
+tmp/
+temp/
+
+# Arquivos de configuração locais
+config.local.php
+.env
+.env.local
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.swp
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# ========================
+# Arquivos específicos do projeto
+# ========================
+test_script.sh
+*.txt
+!README.md
+!MANUAL_*.txt
+
+# Postman (se contém dados sensíveis)
+postman/*.postman_environment.json
+postman/*-environment.json
+
+# ========================
+# Sistema
+# ========================
+.DS_Store
+Thumbs.db
+desktop.ini
