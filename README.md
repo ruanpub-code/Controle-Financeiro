@@ -302,3 +302,5 @@ Observacao de seguranca:
 - Campo/coluna alterado em createModuleConfig foi refletido no backend?
 - Filtro aplicado esta no escopo correto em moduleLoader?
 - Mudancas em financeiro mantiveram baixa/estorno e saldo coerentes?
+
+FIM
